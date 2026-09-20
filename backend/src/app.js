@@ -11,6 +11,7 @@ const farmerRoutes = require('./routes/farmerRoutes');
 const expertRoutes = require('./routes/expertRoutes');
 const buyerRoutes = require('./routes/buyerRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -41,6 +42,7 @@ app.use('/api/v1/farmers', farmerRoutes);
 app.use('/api/v1/experts', expertRoutes);
 app.use('/api/v1/buyers', buyerRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/ai', aiRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

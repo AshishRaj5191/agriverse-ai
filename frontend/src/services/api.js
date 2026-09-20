@@ -76,6 +76,20 @@ export async function deleteRecordImage(recordId, imagePublicId) {
   return response.data;
 }
 
+// AI Disease Prediction API
+export async function predictDisease(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await api.post('/ai/predict', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
+}
+
 export async function addFertilizerEntry(recordId, payload) {
   const response = await api.post(`/farmers/farm-records/${recordId}/fertilizers`, payload);
   return response.data;

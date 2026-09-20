@@ -141,3 +141,14 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Python / AI service
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local ML datasets
+ai-service/data/
+# Local AI test images
+source-image.jpg

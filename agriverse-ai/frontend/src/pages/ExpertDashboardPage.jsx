@@ -3,7 +3,7 @@ import RoleDashboard from './RoleDashboard';
 const quickLinks = [
   { to: '/expert/dashboard', label: 'Dashboard' },
   { to: '/expert/profile', label: 'Expert Profile' },
-  { to: '/expert/consultations', label: 'Consultations' },
+  { to: '/expert/consultations', label: 'Consultation Requests' },
   { to: '/expert/requests', label: 'Requests' },
   { to: '/expert/notes', label: 'Field Notes' },
 ];

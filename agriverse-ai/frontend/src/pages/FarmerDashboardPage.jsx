@@ -7,6 +7,7 @@ const quickLinks = [
   { to: '/farmer/recommendations', label: 'Recommendations' },
   { to: '/farmer/weather', label: 'Weather' },
   { to: '/farmer/experts', label: 'Experts' },
+  { to: '/farmer/consultations', label: 'Consultations' },
   { to: '/farmer/marketplace', label: 'Marketplace' },
   { to: '/farmer/farm-records', label: 'Farm Records' },
   { to: '/farmer/notifications', label: 'Notifications' },

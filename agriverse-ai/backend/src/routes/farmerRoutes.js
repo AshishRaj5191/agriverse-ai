@@ -3,6 +3,7 @@ const { authenticate, authorize } = require('../middleware/authMiddleware');
 const {
   fetchFarmerProfile,
   updateFarmerProfileHandler,
+  listVerifiedExperts,
 } = require('../controllers/profileController');
 const farmRecordsRoutes = require('./farmRecordsRoutes');
 
@@ -13,6 +14,7 @@ router.use(authorize('farmer'));
 
 router.get('/profile', fetchFarmerProfile);
 router.put('/profile', updateFarmerProfileHandler);
+router.get('/experts', listVerifiedExperts);
 
 router.use('/farm-records', farmRecordsRoutes);
 

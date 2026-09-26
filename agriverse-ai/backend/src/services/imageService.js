@@ -4,13 +4,13 @@ const ApiError = require('../utils/ApiError');
 const ALLOWED_FORMATS = ['jpeg', 'jpg', 'png', 'webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-async function uploadImage(fileBuffer, fileName) {
+async function uploadImage(fileBuffer, fileName, folder = 'farm_records') {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         resource_type: 'auto',
         allowed_formats: ALLOWED_FORMATS,
-        folder: 'agriverse_ai/farm_records',
+        folder: `agriverse_ai/${folder}`,
         public_id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       },
       (error, result) => {

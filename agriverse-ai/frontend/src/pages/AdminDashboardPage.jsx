@@ -17,17 +17,19 @@ function AdminDashboardPage() {
     async function fetchSummary() {
       try {
         const token = getToken();
-        const usersResponse = await api.get('/admin/users', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const [usersResponse, expertsResponse] = await Promise.all([
+          api.get('/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
+          api.get('/admin/experts', { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
         const users = usersResponse?.data?.data || [];
+        const experts = expertsResponse?.data?.data || [];
 
         setSummary({
           totalUsers: users.length,
           totalFarmers: users.filter((user) => user.role === 'farmer').length,
           totalExperts: users.filter((user) => user.role === 'expert').length,
           totalBuyers: users.filter((user) => user.role === 'buyer').length,
-          pendingExpertVerifications: users.filter((user) => user.role === 'expert').length,
+          pendingExpertVerifications: experts.filter((expert) => expert.verificationStatus === 'pending').length,
           marketplaceListings: 0,
         });
       } catch (error) {

@@ -23,34 +23,44 @@ const expertProfileSchema = new mongoose.Schema(
     phone: {
       type: String,
       trim: true,
+      match: [/^\+?[0-9][0-9\s-]{9,14}$/, 'Please provide a valid phone number.'],
     },
     specialization: {
       type: String,
       trim: true,
+      required: true,
+      maxlength: 80,
     },
     experience: {
-      type: String,
-      trim: true,
+      type: Number,
+      min: 0,
+      max: 60,
     },
     qualification: {
       type: String,
       trim: true,
+      required: true,
+      maxlength: 120,
     },
     state: {
       type: String,
       trim: true,
+      required: true,
     },
     district: {
       type: String,
       trim: true,
+      required: true,
     },
     serviceRadius: {
-      type: String,
-      trim: true,
+      type: Number,
+      min: 1,
+      max: 1000,
     },
     bio: {
       type: String,
       trim: true,
+      maxlength: 1000,
     },
     verificationStatus: {
       type: String,
@@ -64,6 +74,7 @@ const expertProfileSchema = new mongoose.Schema(
 );
 
 expertProfileSchema.index({ verificationStatus: 1, state: 1 });
+expertProfileSchema.index({ verificationStatus: 1, state: 1, district: 1, specialization: 1 });
 
 const ExpertProfile = mongoose.model('ExpertProfile', expertProfileSchema);
 

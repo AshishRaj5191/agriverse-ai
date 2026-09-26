@@ -7,6 +7,8 @@ const {
   updateBuyerProfile,
   getAdminUsers,
   getAdminExperts,
+  getVerifiedExperts,
+  updateExpertVerification,
 } = require('../services/profileService');
 
 async function fetchFarmerProfile(req, res, next) {
@@ -81,6 +83,28 @@ async function listAdminExperts(req, res, next) {
   }
 }
 
+async function listVerifiedExperts(req, res, next) {
+  try {
+    const experts = await getVerifiedExperts(req.query);
+    return res.status(200).json({ success: true, data: experts });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function updateExpertVerificationHandler(req, res, next) {
+  try {
+    const profile = await updateExpertVerification(req.params.id, req.body.verificationStatus);
+    return res.status(200).json({
+      success: true,
+      message: 'Expert verification status updated successfully.',
+      data: profile,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   fetchFarmerProfile,
   updateFarmerProfileHandler,
@@ -90,4 +114,6 @@ module.exports = {
   updateBuyerProfileHandler,
   listAdminUsers,
   listAdminExperts,
+  listVerifiedExperts,
+  updateExpertVerificationHandler,
 };

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAuthSession } from '../utils/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
@@ -17,6 +18,16 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && !error.config?.url?.startsWith('/auth/')) {
+      clearAuthSession();
+    }
+    return Promise.reject(error);
+  }
+);
 
 export async function registerUser(payload) {
   const response = await api.post('/auth/register', payload);
@@ -73,6 +84,76 @@ export async function deleteRecordImage(recordId, imagePublicId) {
   const response = await api.delete(
     `/farmers/farm-records/${recordId}/images/${encodedPublicId}`
   );
+  return response.data;
+}
+
+export async function getIndianLocations() {
+  const response = await api.get('/locations');
+  return response.data;
+}
+
+export async function getVerifiedExperts(filters = {}) {
+  const response = await api.get('/farmers/experts', { params: filters });
+  return response.data;
+}
+
+export async function updateExpertVerification(profileId, verificationStatus) {
+  const response = await api.patch(`/admin/experts/${profileId}/verification`, {
+    verificationStatus,
+  });
+  return response.data;
+}
+
+export async function createConsultation(payload, images = []) {
+  const formData = new FormData();
+  Object.entries(payload).forEach(([key, value]) => formData.append(key, value ?? ''));
+  images.forEach((image) => formData.append('images', image));
+  const response = await api.post('/consultations', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+  return response.data;
+}
+
+export async function getFarmerConsultations() {
+  const response = await api.get('/consultations/farmer');
+  return response.data;
+}
+
+export async function getExpertConsultations() {
+  const response = await api.get('/consultations/expert');
+  return response.data;
+}
+
+export async function getConsultation(id) {
+  const response = await api.get(`/consultations/${id}`);
+  return response.data;
+}
+
+export async function respondToConsultation(id, payload) {
+  const response = await api.patch(`/consultations/${id}/respond`, payload);
+  return response.data;
+}
+
+export async function acceptConsultation(id) {
+  const response = await api.patch(`/consultations/${id}/accept`);
+  return response.data;
+}
+
+export async function declineConsultation(id) {
+  const response = await api.patch(`/consultations/${id}/decline`);
+  return response.data;
+}
+
+export async function getConsultationMessages(id) {
+  const response = await api.get(`/consultations/${id}/messages`);
+  return response.data;
+}
+
+export async function sendConsultationMessage(id, message) {
+  const response = await api.post(`/consultations/${id}/messages`, { message });
+  return response.data;
+}
+
+export async function getNotifications() {
+  const response = await api.get('/notifications');
   return response.data;
 }
 

@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const env = require('./env');
 
+const retryDelayMs = 10000;
+let retryScheduled = false;
+
 // Disable command buffering so disconnected DB calls fail fast instead of timing out.
 mongoose.set('bufferCommands', false);
 
@@ -17,7 +20,14 @@ async function connectDatabase() {
     console.log('[DB] MongoDB connected successfully.');
   } catch (error) {
     console.error('[DB] MongoDB connection failed:', error.message);
-    console.error('[DB] Server will continue to run. Retry after fixing MongoDB.');
+    if (!retryScheduled) {
+      retryScheduled = true;
+      console.error(`[DB] Retrying MongoDB connection in ${retryDelayMs / 1000} seconds.`);
+      setTimeout(async () => {
+        retryScheduled = false;
+        await connectDatabase();
+      }, retryDelayMs);
+    }
   }
 }
 

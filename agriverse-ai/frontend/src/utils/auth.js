@@ -13,6 +13,15 @@ export function getUserRole() {
   }
 }
 
+export function getCurrentUser() {
+  try {
+    const raw = localStorage.getItem('agriverse_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
 export function saveAuthSession(user, token) {
   if (user) {
     localStorage.setItem('agriverse_user', JSON.stringify(user));

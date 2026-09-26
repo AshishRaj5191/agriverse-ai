@@ -8,6 +8,7 @@ import ExpertDashboardPage from './pages/ExpertDashboardPage'
 import ExpertProfilePage from './pages/ExpertProfilePage'
 import FarmerDashboardPage from './pages/FarmerDashboardPage'
 import FarmerProfilePage from './pages/FarmerProfilePage'
+import FarmerExpertsPage from './pages/FarmerExpertsPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -16,6 +17,9 @@ import ExpertsManagementPage from './pages/ExpertsManagementPage'
 import FarmRecordsListPage from './pages/farmer/FarmRecordsListPage'
 import AddFarmRecordPage from './pages/farmer/AddFarmRecordPage'
 import FarmRecordDetailsPage from './pages/farmer/FarmRecordDetailsPage'
+import FarmerExpertConsultationPage from './pages/FarmerExpertConsultationPage'
+import FarmerConsultationsPage from './pages/FarmerConsultationsPage'
+import ExpertConsultationsPage from './pages/ExpertConsultationsPage'
 
 function App() {
   return (
@@ -44,6 +48,14 @@ function App() {
             }
           />
           <Route
+            path="/farmer/experts"
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <FarmerExpertsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/farmer/farm-records"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
@@ -67,6 +79,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/farmer/expert-consultation/:expertId" element={<ProtectedRoute allowedRoles={['farmer']}><FarmerExpertConsultationPage /></ProtectedRoute>} />
+          <Route path="/farmer/consultations" element={<ProtectedRoute allowedRoles={['farmer']}><FarmerConsultationsPage /></ProtectedRoute>} />
+          <Route path="/farmer/consultations/:id" element={<ProtectedRoute allowedRoles={['farmer']}><FarmerConsultationsPage /></ProtectedRoute>} />
 
           <Route
             path="/expert/dashboard"
@@ -84,6 +99,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/expert/consultations" element={<ProtectedRoute allowedRoles={['expert']}><ExpertConsultationsPage /></ProtectedRoute>} />
+          <Route path="/expert/consultations/:id" element={<ProtectedRoute allowedRoles={['expert']}><ExpertConsultationsPage /></ProtectedRoute>} />
 
           <Route
             path="/buyer/dashboard"

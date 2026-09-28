@@ -16,6 +16,7 @@ import ExpertsManagementPage from './pages/ExpertsManagementPage'
 import FarmRecordsListPage from './pages/farmer/FarmRecordsListPage'
 import AddFarmRecordPage from './pages/farmer/AddFarmRecordPage'
 import FarmRecordDetailsPage from './pages/farmer/FarmRecordDetailsPage'
+import DiseaseDetectionPage from './pages/DiseaseDetectionPage'
 
 function App() {
   return (
@@ -40,6 +41,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <FarmerProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/farmer/disease-detection"
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DiseaseDetectionPage />
               </ProtectedRoute>
             }
           />
@@ -135,3 +144,4 @@ function App() {
 }
 
 export default App
+

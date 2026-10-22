@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+python-multipart
+python-dotenv
+pillow
+# Install torch and torchvision separately when enabling model predictions.

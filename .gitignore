@@ -69,6 +69,10 @@ web_modules/
 .env
 .env.*
 !.env.example
+# AI agent secrets
+ai-agent_1/.env
+ai-agent_1/.env.*
+!ai-agent_1/.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -141,3 +145,14 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Python / AI service
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local ML datasets
+ai-service/data/
+# Local AI test images
+source-image.jpg

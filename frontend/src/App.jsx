@@ -1,136 +1,180 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import Navbar from './components/Navbar'
-import ProtectedRoute from './components/ProtectedRoute'
-import AdminDashboardPage from './pages/AdminDashboardPage'
-import BuyerDashboardPage from './pages/BuyerDashboardPage'
-import BuyerProfilePage from './pages/BuyerProfilePage'
-import ExpertDashboardPage from './pages/ExpertDashboardPage'
-import ExpertProfilePage from './pages/ExpertProfilePage'
-import FarmerDashboardPage from './pages/FarmerDashboardPage'
-import FarmerProfilePage from './pages/FarmerProfilePage'
-import HomePage from './pages/HomePage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import UsersManagementPage from './pages/UsersManagementPage'
-import ExpertsManagementPage from './pages/ExpertsManagementPage'
-import FarmRecordsListPage from './pages/farmer/FarmRecordsListPage'
-import AddFarmRecordPage from './pages/farmer/AddFarmRecordPage'
-import FarmRecordDetailsPage from './pages/farmer/FarmRecordDetailsPage'
-import DiseaseDetectionPage from './pages/DiseaseDetectionPage'
+import { Navigate, Route, Routes } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import BuyerDashboardPage from "./pages/BuyerDashboardPage";
+import BuyerProfilePage from "./pages/BuyerProfilePage";
+import ExpertDashboardPage from "./pages/ExpertDashboardPage";
+import ExpertProfilePage from "./pages/ExpertProfilePage";
+import FarmerDashboardPage from "./pages/FarmerDashboardPage";
+import FarmerProfilePage from "./pages/FarmerProfilePage";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import UsersManagementPage from "./pages/UsersManagementPage";
+import ExpertsManagementPage from "./pages/ExpertsManagementPage";
+import FarmRecordsListPage from "./pages/farmer/FarmRecordsListPage";
+import AddFarmRecordPage from "./pages/farmer/AddFarmRecordPage";
+import FarmRecordDetailsPage from "./pages/farmer/FarmRecordDetailsPage";
+import DiseaseDetectionPage from "./pages/DiseaseDetectionPage";
+import CropRecommendationPage from "./pages/CropRecommendationPage";
+import FertilizerRecommendationPage from "./pages/FertilizerRecommendationPage";
+import WeatherPage from "./pages/WeatherPage";
 
 function App() {
   return (
     <div className="min-h-screen bg-field text-slate-800">
       <Navbar />
+
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
+          {/* Farmer Routes */}
           <Route
             path="/farmer/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['farmer']}>
+              <ProtectedRoute allowedRoles={["farmer"]}>
                 <FarmerDashboardPage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/farmer/profile"
             element={
-              <ProtectedRoute allowedRoles={['farmer']}>
+              <ProtectedRoute allowedRoles={["farmer"]}>
                 <FarmerProfilePage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/farmer/disease-detection"
             element={
-              <ProtectedRoute allowedRoles={['farmer']}>
+              <ProtectedRoute allowedRoles={["farmer"]}>
                 <DiseaseDetectionPage />
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/farmer/crop-recommendation"
+            element={
+              <ProtectedRoute allowedRoles={["farmer"]}>
+                <CropRecommendationPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/farmer/fertilizer-recommendation"
+            element={
+              <ProtectedRoute allowedRoles={["farmer"]}>
+                <FertilizerRecommendationPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/farmer/weather"
+            element={
+              <ProtectedRoute allowedRoles={["farmer"]}>
+                <WeatherPage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/farmer/farm-records"
             element={
-              <ProtectedRoute allowedRoles={['farmer']}>
+              <ProtectedRoute allowedRoles={["farmer"]}>
                 <FarmRecordsListPage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/farmer/farm-records/add"
             element={
-              <ProtectedRoute allowedRoles={['farmer']}>
+              <ProtectedRoute allowedRoles={["farmer"]}>
                 <AddFarmRecordPage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/farmer/farm-records/:id"
             element={
-              <ProtectedRoute allowedRoles={['farmer']}>
+              <ProtectedRoute allowedRoles={["farmer"]}>
                 <FarmRecordDetailsPage />
               </ProtectedRoute>
             }
           />
 
+          {/* Expert Routes */}
           <Route
             path="/expert/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['expert']}>
+              <ProtectedRoute allowedRoles={["expert"]}>
                 <ExpertDashboardPage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/expert/profile"
             element={
-              <ProtectedRoute allowedRoles={['expert']}>
+              <ProtectedRoute allowedRoles={["expert"]}>
                 <ExpertProfilePage />
               </ProtectedRoute>
             }
           />
 
+          {/* Buyer Routes */}
           <Route
             path="/buyer/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['buyer']}>
+              <ProtectedRoute allowedRoles={["buyer"]}>
                 <BuyerDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/buyer/profile"
-            element={
-              <ProtectedRoute allowedRoles={['buyer']}>
-                <BuyerProfilePage />
               </ProtectedRoute>
             }
           />
 
           <Route
+            path="/buyer/profile"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Routes */}
+          <Route
             path="/admin/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminDashboardPage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/users"
             element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <UsersManagementPage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/experts"
             element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <ExpertsManagementPage />
               </ProtectedRoute>
             }
@@ -140,8 +184,7 @@ function App() {
         </Routes>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
-
+export default App;

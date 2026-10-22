@@ -5,6 +5,7 @@ const {
   updateFarmerProfileHandler,
 } = require('../controllers/profileController');
 const farmRecordsRoutes = require('./farmRecordsRoutes');
+const recommendationRoutes = require('./recommendationRoutes');
 
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.get('/profile', fetchFarmerProfile);
 router.put('/profile', updateFarmerProfileHandler);
 
 router.use('/farm-records', farmRecordsRoutes);
+router.use('/recommendations', recommendationRoutes);
 
 module.exports = router;

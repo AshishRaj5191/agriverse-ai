@@ -5,7 +5,8 @@ const quickLinks = [
   { to: '/farmer/dashboard', label: 'Dashboard' },
   { to: '/farmer/profile', label: 'Farmer Profile' },
   { to: '/farmer/disease-detection', label: 'Disease Detection' },
-  { to: '/farmer/recommendations', label: 'Recommendations' },
+  { to: '/farmer/crop-recommendation', label: 'Crop Recommendation' },
+  { to: '/farmer/fertilizer-recommendation', label: 'Fertilizer Recommendation' },
   { to: '/farmer/weather', label: 'Weather' },
   { to: '/farmer/experts', label: 'Experts' },
   { to: '/farmer/marketplace', label: 'Marketplace' },
@@ -20,21 +21,51 @@ function FarmerDashboardPage() {
         role="farmer"
         title="Farmer Dashboard"
         summaryCards={[
-          { title: 'Profile status', value: 'Ready', subtitle: 'Farmer profile setup' },
-          { title: 'Current crops', value: '3', subtitle: 'Active crop records' },
-          { title: 'Farm area', value: '12.5 ha', subtitle: 'Operational land' },
-          { title: 'Pending alerts', value: '2', subtitle: 'Needs attention' },
+          {
+            title: 'Profile status',
+            value: 'Ready',
+            subtitle: 'Farmer profile setup',
+          },
+          {
+            title: 'Current crops',
+            value: '3',
+            subtitle: 'Active crop records',
+          },
+          {
+            title: 'Farm area',
+            value: '12.5 ha',
+            subtitle: 'Operational land',
+          },
+          {
+            title: 'Pending alerts',
+            value: '2',
+            subtitle: 'Needs attention',
+          },
         ]}
         quickLinks={quickLinks}
         profileLink="/farmer/profile"
         details={[
-          { label: 'Welcome', value: 'Welcome back to your farm dashboard.' },
-          { label: 'Farm info', value: 'Farm summary and crop overview will be available here.' },
-          { label: 'Current crop summary', value: 'Rice, wheat, and maize planned for the season.' },
-          { label: 'Upcoming actions', value: 'Check disease alerts, recommendations, and seasonal advice.' },
+          {
+            label: 'Welcome',
+            value: 'Welcome back to your farm dashboard.',
+          },
+          {
+            label: 'Farm info',
+            value: 'Farm summary and crop overview will be available here.',
+          },
+          {
+            label: 'Current crop summary',
+            value: 'Rice, wheat, and maize planned for the season.',
+          },
+          {
+            label: 'Upcoming actions',
+            value:
+              'Check disease alerts, recommendations, and seasonal advice.',
+          },
         ]}
       />
 
+      {/* AI Leaf Scanner */}
       <section className="rounded-2xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-6 shadow-sm">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
@@ -57,6 +88,60 @@ function FarmerDashboardPage() {
             className="inline-flex shrink-0 items-center justify-center rounded-xl bg-green-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-800"
           >
             Scan Leaf
+          </Link>
+        </div>
+      </section>
+
+      {/* Crop Recommendation */}
+      <section className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 p-6 shadow-sm">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+              Smart Farming
+            </p>
+
+            <h2 className="mt-1 text-2xl font-bold text-slate-900">
+              Crop Recommendation
+            </h2>
+
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Select your soil type, season and irrigation availability to
+              receive suitable crop recommendations.
+            </p>
+          </div>
+
+          <Link
+            to="/farmer/crop-recommendation"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800"
+          >
+            Get Recommendations
+          </Link>
+        </div>
+      </section>
+
+      {/* Fertilizer Recommendation */}
+      <section className="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-6 shadow-sm">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-amber-700">
+              Smart Farming
+            </p>
+
+            <h2 className="mt-1 text-2xl font-bold text-slate-900">
+              Fertilizer Recommendation
+            </h2>
+
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Select your crop to receive fertilizer, nutrient and application
+              guidance from the AgriVerse recommendation system.
+            </p>
+          </div>
+
+          <Link
+            to="/farmer/fertilizer-recommendation"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-amber-700"
+          >
+            Get Fertilizer Advice
           </Link>
         </div>
       </section>

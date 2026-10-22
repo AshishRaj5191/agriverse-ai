@@ -83,6 +83,19 @@ transform = transforms.Compose([
 
 
 # --------------------------------------------------
+# Helpers
+# --------------------------------------------------
+
+def parse_class_name(class_name):
+    crop, disease = class_name.split("___", 1)
+
+    return {
+        "crop": crop.replace("_", " ").strip(),
+        "disease": disease.replace("_", " ").strip(),
+    }
+
+
+# --------------------------------------------------
 # Routes
 # --------------------------------------------------
 
@@ -141,8 +154,13 @@ async def predict(file: UploadFile = File(...)):
         top_probabilities,
         top_indices,
     ):
+        class_name = CLASSES[index.item()]
+        parsed = parse_class_name(class_name)
+
         predictions.append({
-            "class": CLASSES[index.item()],
+            "class": class_name,
+            "crop": parsed["crop"],
+            "disease": parsed["disease"],
             "confidence": round(
                 probability.item() * 100,
                 2,

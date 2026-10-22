@@ -12,6 +12,8 @@ const expertRoutes = require('./routes/expertRoutes');
 const buyerRoutes = require('./routes/buyerRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const weatherRoutes = require('./routes/weatherRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -43,6 +45,8 @@ app.use('/api/v1/experts', expertRoutes);
 app.use('/api/v1/buyers', buyerRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ai', aiRoutes);
+app.use('/api/v1/weather', weatherRoutes);
+app.use('/api/v1/recommendations', recommendationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

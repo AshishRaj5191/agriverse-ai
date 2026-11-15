@@ -156,3 +156,6 @@ venv/
 ai-service/data/
 # Local AI test images
 source-image.jpg
+
+# Local development image uploads
+uploads/

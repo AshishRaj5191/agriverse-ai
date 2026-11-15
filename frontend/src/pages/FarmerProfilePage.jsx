@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { getToken } from '../utils/auth';
 
@@ -13,6 +14,7 @@ const defaultForm = {
   irrigationType: '',
   primaryCrops: '',
   preferredLanguage: '',
+  marketplacePhonePublic: false,
 };
 
 function FarmerProfilePage() {
@@ -71,6 +73,9 @@ function FarmerProfilePage() {
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <h1 className="text-2xl font-bold text-slate-900">Farmer Profile</h1>
       <p className="mt-1 text-sm text-slate-600">Manage your farm details and personal information.</p>
+      <Link to="/farmer/marketplace" className="mt-4 inline-flex rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800">
+        Sell animals or farm products
+      </Link>
 
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
         {[
@@ -95,6 +100,19 @@ function FarmerProfilePage() {
             />
           </div>
         ))}
+
+        <label className="flex items-center gap-2 text-sm text-slate-700 md:col-span-2">
+          <input
+            type="checkbox"
+            name="marketplacePhonePublic"
+            checked={Boolean(form.marketplacePhonePublic)}
+            onChange={(event) => setForm((prev) => ({ ...prev, marketplacePhonePublic: event.target.checked }))}
+          />
+          Allow buyers to see my phone number and call me for marketplace listings
+        </label>
+        <p className="text-xs text-slate-500 md:col-span-2">
+          If unchecked, buyers can still contact you securely through Marketplace chat and inquiries.
+        </p>
 
         {error ? <div className="md:col-span-2 text-sm text-red-600">{error}</div> : null}
 

@@ -10,11 +10,14 @@ const env = {
   jwtSecret: process.env.JWT_SECRET || 'dev_jwt_secret_change_me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  publicApiUrl: process.env.PUBLIC_API_URL || `http://localhost:${process.env.PORT || 5000}`,
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
   demoAdminEmail: process.env.DEMO_ADMIN_EMAIL || '',
   demoAdminPassword: process.env.DEMO_ADMIN_PASSWORD || '',
+  groqApiKey: process.env.GROQ_API_KEY || '',
+  groqModel: process.env.GROQ_MODEL || 'openai/gpt-oss-20b',
 };
 
 module.exports = env;

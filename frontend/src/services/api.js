@@ -92,6 +92,16 @@ export async function getIndianLocations() {
   return response.data;
 }
 
+export async function getFarmerProfile() {
+  const response = await api.get('/farmers/profile');
+  return response.data;
+}
+
+export async function getBuyerProfile() {
+  const response = await api.get('/buyers/profile');
+  return response.data;
+}
+
 export async function getVerifiedExperts(filters = {}) {
   const response = await api.get('/farmers/experts', { params: filters });
   return response.data;
@@ -182,6 +192,11 @@ export async function getNotifications() {
   return response.data;
 }
 
+export async function markNotificationRead(id) {
+  const response = await api.patch(`/notifications/${id}/read`);
+  return response.data;
+}
+
 export async function predictDisease(file) {
   const formData = new FormData();
   formData.append('file', file);
@@ -216,7 +231,7 @@ export async function addDiseaseEntry(recordId, payload) {
 }
 
 export async function getWeather(location) {
-  const response = await api.get('/weather', { params: { location } });
+  const response = await api.get('/weather', { params: { city: location } });
   return response.data;
 }
 
@@ -227,6 +242,67 @@ export async function recommendCrops(payload) {
 
 export async function recommendFertilizer(payload) {
   const response = await api.post('/recommendations/fertilizer', payload);
+  return response.data;
+}
+
+export async function getMarketplaceProducts(params = {}) {
+  const response = await api.get('/marketplace', { params });
+  return response.data;
+}
+
+export async function getMarketplaceProduct(id) {
+  const response = await api.get(`/marketplace/${id}`);
+  return response.data;
+}
+
+export async function getMyMarketplaceProducts() {
+  const response = await api.get('/marketplace/seller/mine');
+  return response.data;
+}
+
+export async function createMarketplaceProduct(payload, images = []) {
+  const formData = new FormData();
+  Object.entries(payload).forEach(([key, value]) => formData.append(key, value ?? ''));
+  images.forEach((image) => formData.append('images', image));
+  const response = await api.post('/marketplace', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+  return response.data;
+}
+
+export async function updateMarketplaceProduct(id, payload, images = []) {
+  const formData = new FormData();
+  Object.entries(payload).forEach(([key, value]) => formData.append(key, value ?? ''));
+  images.forEach((image) => formData.append('images', image));
+  const response = await api.put(`/marketplace/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+  return response.data;
+}
+
+export async function deleteMarketplaceProduct(id) {
+  const response = await api.delete(`/marketplace/${id}`);
+  return response.data;
+}
+
+export async function contactMarketplaceSeller(id, message) {
+  const response = await api.post(`/marketplace/${id}/inquiries`, { message });
+  return response.data;
+}
+
+export async function startMarketplaceConversation(listingId) {
+  const response = await api.post('/marketplace/conversations', { listingId });
+  return response.data;
+}
+
+export async function getMarketplaceConversations() {
+  const response = await api.get('/marketplace/conversations');
+  return response.data;
+}
+
+export async function getMarketplaceMessages(conversationId) {
+  const response = await api.get(`/marketplace/conversations/${conversationId}/messages`);
+  return response.data;
+}
+
+export async function sendMarketplaceMessage(conversationId, message) {
+  const response = await api.post(`/marketplace/conversations/${conversationId}/messages`, { message });
   return response.data;
 }
 

@@ -1,10 +1,32 @@
 const cloudinary = require('./cloudinaryService');
+const env = require('../config/env');
 const ApiError = require('../utils/ApiError');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
 
 const ALLOWED_FORMATS = ['jpeg', 'jpg', 'png', 'webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const LOCAL_UPLOAD_DIR = path.resolve(__dirname, '../../uploads');
+const cloudinaryConfigured = Boolean(
+  env.cloudinaryCloudName &&
+  env.cloudinaryApiKey &&
+  env.cloudinaryApiSecret
+);
 
 async function uploadImage(fileBuffer, fileName, folder = 'farm_records') {
+  if (!cloudinaryConfigured) {
+    fs.mkdirSync(LOCAL_UPLOAD_DIR, { recursive: true });
+    const extension = path.extname(fileName || '').toLowerCase().replace(/[^a-z0-9.]/g, '') || '.jpg';
+    const storedName = `${crypto.randomBytes(16).toString('hex')}${extension}`;
+    fs.writeFileSync(path.join(LOCAL_UPLOAD_DIR, storedName), fileBuffer);
+    console.warn('[Images] Cloudinary is not configured; storing uploads locally.');
+    return {
+      url: `${env.publicApiUrl}/uploads/${storedName}`,
+      publicId: `local/${storedName}`,
+    };
+  }
+
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
@@ -30,6 +52,13 @@ async function uploadImage(fileBuffer, fileName, folder = 'farm_records') {
 }
 
 async function deleteImage(publicId) {
+  if (publicId?.startsWith('local/')) {
+    const fileName = path.basename(publicId);
+    const filePath = path.join(LOCAL_UPLOAD_DIR, fileName);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    return true;
+  }
+
   try {
     const result = await cloudinary.uploader.destroy(publicId);
     if (result && result.result === 'ok') {

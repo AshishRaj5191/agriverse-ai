@@ -22,6 +22,10 @@ const farmerProfileSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    marketplacePhonePublic: {
+      type: Boolean,
+      default: false,
+    },
     state: {
       type: String,
       trim: true,

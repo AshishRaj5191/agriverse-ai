@@ -9,9 +9,9 @@ const moduleCopy = {
   },
   marketplace: {
     title: 'Marketplace',
-    message: 'Marketplace data is not available in the current project build. Product prices and availability will appear here only when a verified marketplace source is connected.',
-    action: 'Return to Voice Assistant',
-    href: '/farmer/voice-assistant',
+    message: 'Farmers can sell animals and farm products with photos, prices, PIN code, district, and state. Buyers can search listings by location.',
+    action: 'Open Marketplace',
+    href: '/farmer/marketplace',
   },
   disease: {
     title: 'Disease Detection',

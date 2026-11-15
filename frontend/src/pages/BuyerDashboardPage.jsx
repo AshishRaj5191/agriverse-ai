@@ -22,10 +22,10 @@ function BuyerDashboardPage() {
       quickLinks={quickLinks}
       profileLink="/buyer/profile"
       details={[
-        { label: 'Marketplace', value: 'Marketplace landing page is ready for future product listings.' },
+        { label: 'Marketplace', value: 'Search farmer listings by state, district, category, PIN code, and price.' },
         { label: 'Buyer profile', value: 'Store your location and buying preferences here.' },
         { label: 'Primary activities', value: 'Browse listings, save favorites, and review order activity.' },
-        { label: 'Next step', value: 'Marketplace CRUD will be added in a later phase.' },
+        { label: 'Next step', value: 'Open Marketplace to contact farmers about available animals and farm products.' },
       ]}
     />
   );

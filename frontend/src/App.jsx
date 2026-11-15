@@ -23,12 +23,15 @@ import ExpertConsultationsPage from './pages/ExpertConsultationsPage'
 import GovernmentSchemesPage from './pages/GovernmentSchemesPage'
 import GovernmentSchemeDetailsPage from './pages/GovernmentSchemeDetailsPage'
 import AdminGovernmentSchemesPage from './pages/AdminGovernmentSchemesPage'
-import FarmerModuleGatewayPage from './pages/FarmerModuleGatewayPage'
 import VoiceAssistantPage from './pages/VoiceAssistantPage'
 import WeatherPage from './pages/WeatherPage'
 import DiseaseDetectionPage from './pages/DiseaseDetectionPage'
 import CropRecommendationPage from './pages/CropRecommendationPage'
 import FertilizerRecommendationPage from './pages/FertilizerRecommendationPage'
+import MarketplacePage from './pages/MarketplacePage'
+import ProductDetailsPage from './pages/ProductDetailsPage'
+import MarketplaceMessagesPage from './pages/MarketplaceMessagesPage'
+import FarmerNotificationsPage from './pages/FarmerNotificationsPage'
 
 function App() {
   return (
@@ -99,7 +102,13 @@ function App() {
           <Route path="/farmer/recommendations" element={<ProtectedRoute allowedRoles={['farmer']}><CropRecommendationPage /></ProtectedRoute>} />
           <Route path="/farmer/crop-recommendation" element={<ProtectedRoute allowedRoles={['farmer']}><CropRecommendationPage /></ProtectedRoute>} />
           <Route path="/farmer/fertilizer-recommendation" element={<ProtectedRoute allowedRoles={['farmer']}><FertilizerRecommendationPage /></ProtectedRoute>} />
-          <Route path="/farmer/marketplace" element={<ProtectedRoute allowedRoles={['farmer']}><FarmerModuleGatewayPage /></ProtectedRoute>} />
+          <Route path="/farmer/marketplace" element={<ProtectedRoute allowedRoles={['farmer']}><MarketplacePage /></ProtectedRoute>} />
+          <Route path="/farmer/marketplace/:id" element={<ProtectedRoute allowedRoles={['farmer']}><ProductDetailsPage /></ProtectedRoute>} />
+          <Route path="/farmer/messages" element={<ProtectedRoute allowedRoles={['farmer']}><MarketplaceMessagesPage /></ProtectedRoute>} />
+          <Route path="/farmer/notifications" element={<ProtectedRoute allowedRoles={['farmer']}><FarmerNotificationsPage /></ProtectedRoute>} />
+          <Route path="/buyer/marketplace" element={<ProtectedRoute allowedRoles={['buyer']}><MarketplacePage /></ProtectedRoute>} />
+          <Route path="/buyer/marketplace/:id" element={<ProtectedRoute allowedRoles={['buyer']}><ProductDetailsPage /></ProtectedRoute>} />
+          <Route path="/buyer/messages" element={<ProtectedRoute allowedRoles={['buyer']}><MarketplaceMessagesPage /></ProtectedRoute>} />
 
           <Route
             path="/expert/dashboard"

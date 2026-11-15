@@ -1,6 +1,6 @@
-const { understandVoiceRequest } = require('../services/voiceService');
+const { answerVoiceQuestion } = require('../services/voiceService');
 
-function processVoiceRequest(req, res, next) {
+async function processVoiceRequest(req, res, next) {
   try {
     const text = String(req.body?.text || '').trim();
 
@@ -12,7 +12,7 @@ function processVoiceRequest(req, res, next) {
       return res.status(400).json({ success: false, message: 'Please keep your question under 1000 characters.' });
     }
 
-    const result = understandVoiceRequest({
+    const result = await answerVoiceQuestion({
       text,
       language: req.body?.language,
       context: req.body?.context,

@@ -1,29 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { processVoiceQuestion } from '../../services/api';
 
 const suggestions = [
-  'Kal baarish hogi?',
-  'Fasal mein disease kaise check karun?',
-  'PM Kisan ke baare mein batao',
-  'Fasal ke liye loan kaise milega?',
-  'Beej kahan se kharid sakta hoon?',
+  'Meri fasal ke patte peele ho rahe hain, kya karun?',
+  'Rabi season mein loamy soil ke liye kaunsi fasal achhi hai?',
+  'PM Kisan scheme ke liye eligibility kya hai?',
+  'Meri fasal ko kitni baar paani dena chahiye?',
 ];
 
 const actionRoutes = {
-  OPEN_WEATHER: { path: '/farmer/weather', label: 'Open Weather' },
-  OPEN_DISEASE_DETECTION: { path: '/farmer/farm-records', label: 'Open Disease Detection' },
-  OPEN_GOVERNMENT_BENEFITS: { path: '/farmer/government-schemes', label: 'Open Government Benefits' },
-  OPEN_MARKETPLACE: { path: '/farmer/marketplace', label: 'Open Marketplace' },
-  OPEN_PROFILE: { path: '/farmer/profile', label: 'Open Profile' },
+  OPEN_WEATHER: { path: '/farmer/weather', label: 'Weather' },
+  OPEN_DISEASE_DETECTION: { path: '/farmer/disease-detection', label: 'Disease Detection' },
+  OPEN_GOVERNMENT_BENEFITS: { path: '/farmer/government-schemes', label: 'Government Schemes' },
+  OPEN_MARKETPLACE: { path: '/farmer/marketplace', label: 'Marketplace' },
+  OPEN_FARM_RECORDS: { path: '/farmer/farm-records', label: 'Farm Records' },
+  OPEN_EXPERT_CONSULTATION: { path: '/farmer/experts', label: 'Expert Consultation' },
+  OPEN_PROFILE: { path: '/farmer/profile', label: 'Profile' },
 };
 
 const statusLabels = {
-  idle: 'Tap to speak',
-  listening: 'Listening...',
-  processing: 'Understanding your request...',
-  speaking: 'Speaking...',
-  error: 'Voice assistant needs attention',
+  ready: 'Ready',
+  listening: 'Listening',
+  processing: 'Processing',
+  answerReady: 'Answer Ready',
+  error: 'Needs attention',
 };
 
 function getRecognitionConstructor() {
@@ -31,59 +32,93 @@ function getRecognitionConstructor() {
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
+function timestamp() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 function VoiceAssistant({ compact = false }) {
-  const navigate = useNavigate();
   const recognitionRef = useRef(null);
+  const statusRef = useRef('ready');
   const [language, setLanguage] = useState('hi-IN');
-  const [status, setStatus] = useState('idle');
+  const [status, setStatusState] = useState('ready');
   const [transcript, setTranscript] = useState('');
   const [typedQuestion, setTypedQuestion] = useState('');
-  const [response, setResponse] = useState(null);
   const [conversation, setConversation] = useState([]);
+  const [lastQuestion, setLastQuestion] = useState('');
   const [error, setError] = useState('');
+  const [providerNotice, setProviderNotice] = useState('');
   const [isSupported, setIsSupported] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const setStatus = (nextStatus) => {
+    statusRef.current = nextStatus;
+    setStatusState(nextStatus);
+  };
 
   useEffect(() => {
     setIsSupported(Boolean(getRecognitionConstructor()));
     return () => {
-      recognitionRef.current?.stop?.();
+      recognitionRef.current?.abort?.();
       window.speechSynthesis?.cancel?.();
     };
   }, []);
 
-  const speakResponse = (text) => {
-    if (!text || typeof window === 'undefined' || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+  const stopSpeaking = () => {
+    window.speechSynthesis?.cancel?.();
+    setIsSpeaking(false);
+  };
+
+  const speakText = (text) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis || !text) {
+      return false;
+    }
+
+    stopSpeaking();
+    const plainText = String(text)
+      .replace(/[*_`#>-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const utterance = new SpeechSynthesisUtterance(plainText);
     utterance.lang = language;
-    utterance.rate = 0.94;
-    utterance.onstart = () => setStatus('speaking');
-    utterance.onend = () => setStatus('idle');
-    utterance.onerror = () => setStatus('idle');
+    utterance.rate = language === 'hi-IN' ? 0.88 : 0.95;
+    utterance.pitch = 1;
     const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find((voice) => voice.lang?.toLowerCase().startsWith(language.slice(0, 2).toLowerCase()));
+    const preferredVoice = voices.find((voice) => (
+      voice.lang?.toLowerCase() === language.toLowerCase()
+      || voice.lang?.toLowerCase().startsWith(language.slice(0, 2).toLowerCase())
+    ));
     if (preferredVoice) utterance.voice = preferredVoice;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
     window.speechSynthesis.speak(utterance);
+    return true;
   };
 
   const processQuestion = async (question) => {
     const cleanQuestion = String(question || '').trim();
-    if (!cleanQuestion) return;
+    if (!cleanQuestion || statusRef.current === 'processing') return;
+
     setStatus('processing');
     setError('');
+    setProviderNotice('');
     setTranscript(cleanQuestion);
     setTypedQuestion('');
-    setConversation((items) => [...items, { speaker: 'You', text: cleanQuestion, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+    setLastQuestion(cleanQuestion);
+    setConversation((items) => [...items, { speaker: 'You', text: cleanQuestion, time: timestamp() }]);
 
     try {
       const result = await processVoiceQuestion({ text: cleanQuestion, language });
-      const assistantResponse = result?.data || result;
-      setResponse(assistantResponse);
-      setConversation((items) => [...items, { speaker: 'AgriVerse AI', text: assistantResponse.response, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
-      speakResponse(assistantResponse.response);
+      const answer = result?.data || result;
+      if (!answer?.response) throw new Error('Empty assistant response');
+
+      setConversation((items) => [...items, { speaker: 'AgriVerse AI', text: answer.response, time: timestamp(), answer }]);
+      setProviderNotice(answer.providerError || '');
+      setStatus('answerReady');
+      speakText(answer.response);
     } catch (requestError) {
       setStatus('error');
-      setError(requestError?.response?.data?.message || 'Main abhi aapki request process nahi kar paaya. Kripya dobara try karein.');
+      setError(requestError?.response?.data?.message || 'Answer receive nahi ho paaya. Please Retry dabayein.');
     }
   };
 
@@ -92,11 +127,11 @@ function VoiceAssistant({ compact = false }) {
     if (!Recognition) {
       setIsSupported(false);
       setStatus('error');
-      setError('Voice recognition is not supported in this browser. Please use a supported browser or type your question below.');
+      setError('Is browser mein speech recognition supported nahi hai. Neeche text box se sawal type karein.');
       return;
     }
 
-    recognitionRef.current?.stop?.();
+    recognitionRef.current?.abort?.();
     const recognition = new Recognition();
     recognition.lang = language;
     recognition.interimResults = true;
@@ -109,88 +144,96 @@ function VoiceAssistant({ compact = false }) {
     recognition.onresult = (event) => {
       const text = Array.from(event.results).map((item) => item[0].transcript).join(' ');
       setTranscript(text);
-      if (event.results[event.results.length - 1].isFinal) processQuestion(text);
+      const finalResult = event.results[event.results.length - 1];
+      if (finalResult?.isFinal) {
+        recognition.stop();
+        processQuestion(text);
+      }
     };
     recognition.onerror = (event) => {
       setStatus('error');
-      setError(event.error === 'not-allowed' ? 'AgriVerse needs microphone access so you can ask questions using your voice.' : 'Main aapki awaaz samajh nahi paaya. Please thoda dheere aur clear bolkar dobara try karein.');
+      const messages = {
+        'not-allowed': 'Microphone permission denied hai. Browser address bar se microphone allow karke dobara try karein.',
+        'no-speech': 'Awaaz detect nahi hui. Microphone ke paas clearly bolkar dobara try karein.',
+        network: 'Speech recognition network error. Text input fallback use karein.',
+      };
+      setError(messages[event.error] || 'Speech recognition fail ho gaya. Text input fallback use karein.');
     };
     recognition.onend = () => {
-      if (status === 'listening') setStatus('idle');
+      if (statusRef.current === 'listening') setStatus('ready');
     };
     recognitionRef.current = recognition;
-    recognition.start();
-  };
-
-  const stopSpeaking = () => {
-    window.speechSynthesis?.cancel?.();
-    setStatus('idle');
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    processQuestion(typedQuestion);
-  };
-
-  const openAction = () => {
-    const route = actionRoutes[response?.action];
-    if (route) navigate(route.path);
+    try {
+      recognition.start();
+    } catch {
+      setStatus('error');
+      setError('Microphone start nahi ho paaya. Permission check karke Retry karein.');
+    }
   };
 
   const clearConversation = () => {
-    stopSpeaking();
+    recognitionRef.current?.abort?.();
     setConversation([]);
-    setResponse(null);
     setTranscript('');
+    setLastQuestion('');
     setError('');
+    setProviderNotice('');
+    setStatus('ready');
   };
 
+  const latestAnswer = [...conversation].reverse().find((message) => message.answer)?.answer;
+
   return (
-    <section className={`rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-5 shadow-sm sm:p-7 ${compact ? '' : 'mx-auto max-w-5xl'}`}>
+    <section className={`mx-auto rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-5 shadow-sm sm:p-7 ${compact ? '' : 'max-w-5xl'}`}>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">AgriVerse AI</p>
-          <h1 className="mt-2 text-3xl font-bold text-slate-900">🎙️ Ask your farming assistant</h1>
-          <p className="mt-2 text-slate-600">Speak naturally in Hindi, Hinglish or English about your crops, weather, schemes and farm needs.</p>
+          <h1 className="mt-2 text-3xl font-bold text-slate-900">Ask your farming assistant</h1>
+          <p className="mt-2 text-slate-600">Hindi, Hinglish या English में बोलें या लिखें। Assistant आपके सवाल के अनुसार जवाब और relevant features दिखाएगा।</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <label className="text-sm font-medium text-slate-700">Voice language<select value={language} onChange={(event) => setLanguage(event.target.value)} className="ml-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="hi-IN">Hindi / Hinglish</option><option value="en-IN">English</option></select></label>
-            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${status === 'listening' ? 'bg-red-100 text-red-700' : status === 'processing' ? 'bg-amber-100 text-amber-800' : status === 'speaking' ? 'bg-sky-100 text-sky-700' : 'bg-emerald-100 text-emerald-700'}`}>{statusLabels[status]}</span>
+            <label className="text-sm font-medium text-slate-700">Language
+              <select value={language} onChange={(event) => setLanguage(event.target.value)} className="ml-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+                <option value="hi-IN">Hindi / Hinglish</option>
+                <option value="en-IN">English</option>
+              </select>
+            </label>
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${status === 'listening' ? 'bg-red-100 text-red-700' : status === 'processing' ? 'bg-amber-100 text-amber-800' : status === 'answerReady' ? 'bg-sky-100 text-sky-700' : status === 'error' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>{statusLabels[status]}</span>
           </div>
         </div>
-
-        <div className="flex shrink-0 flex-col items-center gap-3">
-          <button type="button" aria-label="Start voice assistant" onClick={status === 'speaking' ? stopSpeaking : startListening} className={`relative flex h-24 w-24 items-center justify-center rounded-full text-3xl text-white shadow-lg transition focus:outline-none focus:ring-4 focus:ring-emerald-200 ${status === 'listening' ? 'animate-pulse bg-red-600' : status === 'speaking' ? 'bg-sky-700' : 'bg-emerald-700 hover:bg-emerald-800'}`}>
-            {status === 'speaking' ? '⏹' : '🎤'}
-          </button>
-          {status === 'speaking' ? <button type="button" onClick={stopSpeaking} className="text-sm font-semibold text-slate-700">Stop speaking</button> : null}
-        </div>
+        <button type="button" aria-label="Start microphone" onClick={startListening} disabled={status === 'processing'} className={`flex h-24 w-24 shrink-0 items-center justify-center self-center rounded-full text-3xl text-white shadow-lg transition focus:outline-none focus:ring-4 focus:ring-emerald-200 ${status === 'listening' ? 'animate-pulse bg-red-600' : 'bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-400'}`}>
+          🎤
+        </button>
       </div>
 
-      {!isSupported ? <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Voice recognition is not supported in this browser. Please use a supported browser or type your question below.</div> : null}
-      {error ? <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div> : null}
+      {!isSupported && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Voice recognition इस browser में उपलब्ध नहीं है। Text input अभी भी काम करेगा।</div>}
+      {error && <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><span>{error}</span>{lastQuestion && <button type="button" onClick={() => processQuestion(lastQuestion)} className="rounded-lg bg-red-700 px-3 py-2 font-semibold text-white">Retry</button>}</div>}
+      {providerNotice && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">{providerNotice} Local safe guidance दिखाई जा रही है। AI provider enable करने के लिए backend में GROQ_API_KEY configure करें।</div>}
 
-      <div className="mt-6 grid gap-5 lg:grid-cols-[1fr,0.9fr]">
-        <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Recognized transcript</p>
-          <p className="mt-3 min-h-14 text-sm leading-6 text-slate-700">{transcript || 'Your spoken question will appear here.'}</p>
-          <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
-            <input value={typedQuestion} onChange={(event) => setTypedQuestion(event.target.value)} placeholder="Type your question" aria-label="Type your farming question" className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500" />
-            <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-700">Ask</button>
-          </form>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">AgriVerse AI response</p>
-          <p className="mt-3 min-h-14 text-sm leading-6 text-slate-700">{response?.response || 'Ask me about farming, weather, crop problems, schemes or agricultural support.'}</p>
-          <div className="mt-4 flex flex-wrap gap-2">{response?.action && response.action !== 'NONE' && actionRoutes[response.action] ? <button type="button" onClick={openAction} className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{actionRoutes[response.action].label} →</button> : null}{response?.response ? <button type="button" onClick={() => speakResponse(response.response)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">🔊 Speak response</button> : null}</div>
-        </div>
+      <div className="mt-6 rounded-2xl border border-slate-200 bg-white/80 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">What I heard</p>
+        <p className="mt-3 min-h-12 text-sm leading-6 text-slate-700">{transcript || 'Microphone से बोले गए शब्द यहाँ दिखेंगे।'}</p>
+        <form onSubmit={(event) => { event.preventDefault(); processQuestion(typedQuestion); }} className="mt-4 flex gap-2">
+          <input value={typedQuestion} onChange={(event) => setTypedQuestion(event.target.value)} placeholder="Type your question" aria-label="Type your farming question" className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500" />
+          <button type="submit" disabled={!typedQuestion.trim() || status === 'processing'} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:bg-slate-400">Send</button>
+        </form>
       </div>
 
-      <div className="mt-6">
-        <div className="flex items-center justify-between gap-3"><p className="text-sm font-semibold text-slate-800">Try asking</p><button type="button" onClick={clearConversation} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Clear conversation</button></div>
-        <div className="mt-3 flex flex-wrap gap-2">{suggestions.map((suggestion) => <button key={suggestion} type="button" onClick={() => processQuestion(suggestion)} className="rounded-full border border-emerald-200 bg-white px-3 py-2 text-left text-sm text-emerald-800 hover:bg-emerald-50">{suggestion}</button>)}</div>
-      </div>
+      {status === 'processing' && <div className="mt-4 flex items-center gap-2 rounded-xl bg-amber-50 p-4 text-sm text-amber-800"><span className="animate-pulse">●●●</span> Answer तैयार किया जा रहा है...</div>}
 
-      {conversation.length ? <div className="mt-6 rounded-2xl border border-slate-200 bg-white/80 p-4"><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Conversation</p><div className="mt-3 max-h-72 space-y-3 overflow-y-auto">{conversation.map((message, index) => <div key={`${message.timestamp}-${index}`} className={`rounded-xl p-3 ${message.speaker === 'You' ? 'bg-slate-100' : 'bg-emerald-50'}`}><div className="flex items-center justify-between gap-3"><span className="text-xs font-bold text-slate-700">{message.speaker}</span><span className="text-[10px] text-slate-500">{message.timestamp}</span></div><p className="mt-1 text-sm leading-6 text-slate-700">{message.text}</p></div>)}</div></div> : null}
+      <div className="mt-6 flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-slate-800">Try asking</p>
+        <button type="button" onClick={clearConversation} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Clear chat</button>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">{suggestions.map((suggestion) => <button key={suggestion} type="button" onClick={() => processQuestion(suggestion)} className="rounded-full border border-emerald-200 bg-white px-3 py-2 text-left text-sm text-emerald-800 hover:bg-emerald-50">{suggestion}</button>)}</div>
+
+      {latestAnswer && <div className="mt-5 flex flex-wrap gap-2">
+        {latestAnswer.actions?.map((action) => actionRoutes[action] ? <Link key={action} to={actionRoutes[action].path} className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{actionRoutes[action].label} →</Link> : null)}
+        {isSpeaking
+          ? <button type="button" onClick={stopSpeaking} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700">Stop speaking</button>
+          : <button type="button" onClick={() => speakText(latestAnswer.response)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700">🔊 Speak answer</button>}
+      </div>}
+
+      {conversation.length > 0 && <div className="mt-6 max-h-96 space-y-3 overflow-y-auto rounded-2xl border border-slate-200 bg-white/80 p-4">{conversation.map((message, index) => <div key={`${message.time}-${index}`} className={`rounded-xl p-3 ${message.speaker === 'You' ? 'bg-slate-100' : 'bg-emerald-50'}`}><div className="flex items-center justify-between gap-3"><span className="text-xs font-bold text-slate-700">{message.speaker}</span><span className="text-[10px] text-slate-500">{message.time}</span></div><p className="mt-1 whitespace-pre-line text-sm leading-6 text-slate-700">{message.text}</p></div>)}</div>}
     </section>
   );
 }

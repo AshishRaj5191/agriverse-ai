@@ -68,6 +68,9 @@ function Navbar() {
                   Dashboard
                 </NavLink>
                 {role === 'farmer' ? <NavLink to="/farmer/voice-assistant" className={navClass}>Voice Assistant</NavLink> : null}
+                {role === 'farmer' || role === 'buyer' ? <NavLink to={`/${role}/marketplace`} className={navClass}>Marketplace</NavLink> : null}
+                {role === 'farmer' || role === 'buyer' ? <NavLink to={`/${role}/messages`} className={navClass}>Messages</NavLink> : null}
+                {role === 'farmer' ? <NavLink to="/farmer/notifications" className={navClass}>Notifications</NavLink> : null}
                 <NavLink to={profilePath} className={navClass}>
                   Profile
                 </NavLink>
@@ -124,6 +127,9 @@ function Navbar() {
                     Dashboard
                   </NavLink>
                   {role === 'farmer' ? <NavLink to="/farmer/voice-assistant" onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">Voice Assistant</NavLink> : null}
+                  {role === 'farmer' || role === 'buyer' ? <NavLink to={`/${role}/marketplace`} onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">Marketplace</NavLink> : null}
+                  {role === 'farmer' || role === 'buyer' ? <NavLink to={`/${role}/messages`} onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">Messages</NavLink> : null}
+                  {role === 'farmer' ? <NavLink to="/farmer/notifications" onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">Notifications</NavLink> : null}
                   <NavLink to={profilePath} onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">
                     Profile
                   </NavLink>

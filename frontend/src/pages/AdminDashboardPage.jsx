@@ -54,7 +54,7 @@ function AdminDashboardPage() {
           ['Total Experts', summary.totalExperts, 'Expert accounts'],
           ['Total Buyers', summary.totalBuyers, 'Buyer accounts'],
           ['Pending Expert Verifications', summary.pendingExpertVerifications, 'Awaiting review'],
-          ['Marketplace Listings', summary.marketplaceListings, 'Placeholder count'],
+          ['Marketplace Listings', summary.marketplaceListings, 'Live count is not included in admin summary yet'],
         ].map(([title, value, subtitle]) => (
           <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm text-slate-500">{title}</p>
@@ -82,7 +82,7 @@ function AdminDashboardPage() {
           <ul className="mt-4 list-disc pl-5 text-sm text-slate-700">
             <li>Role-based access control is enforced on protected routes.</li>
             <li>Expert verification status is prepared for upcoming admin review workflow.</li>
-            <li>Marketplace CRUD remains pending and is intentionally not implemented.</li>
+            <li>Farmers can publish animal and farm-product listings with photos, prices, and location details.</li>
           </ul>
         </div>
       </div>

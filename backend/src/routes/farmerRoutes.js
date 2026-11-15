@@ -6,6 +6,7 @@ const {
   listVerifiedExperts,
 } = require('../controllers/profileController');
 const farmRecordsRoutes = require('./farmRecordsRoutes');
+const recommendationRoutes = require('./recommendationRoutes');
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.put('/profile', updateFarmerProfileHandler);
 router.get('/experts', listVerifiedExperts);
 
 router.use('/farm-records', farmRecordsRoutes);
+router.use('/recommendations', recommendationRoutes);
 
 module.exports = router;

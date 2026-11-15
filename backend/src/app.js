@@ -17,6 +17,8 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const voiceRoutes = require('./routes/voiceRoutes');
 const governmentSchemeRoutes = require('./routes/governmentSchemeRoutes');
+const weatherRoutes = require('./routes/weatherRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -65,6 +67,8 @@ app.use('/api/v1/consultations', consultationRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/voice', voiceRoutes);
+app.use('/api/v1/weather', weatherRoutes);
+app.use('/api/v1/recommendations', recommendationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

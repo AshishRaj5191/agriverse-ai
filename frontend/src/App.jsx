@@ -25,6 +25,10 @@ import GovernmentSchemeDetailsPage from './pages/GovernmentSchemeDetailsPage'
 import AdminGovernmentSchemesPage from './pages/AdminGovernmentSchemesPage'
 import FarmerModuleGatewayPage from './pages/FarmerModuleGatewayPage'
 import VoiceAssistantPage from './pages/VoiceAssistantPage'
+import WeatherPage from './pages/WeatherPage'
+import DiseaseDetectionPage from './pages/DiseaseDetectionPage'
+import CropRecommendationPage from './pages/CropRecommendationPage'
+import FertilizerRecommendationPage from './pages/FertilizerRecommendationPage'
 
 function App() {
   return (
@@ -90,8 +94,11 @@ function App() {
           <Route path="/farmer/government-schemes" element={<ProtectedRoute allowedRoles={['farmer']}><GovernmentSchemesPage /></ProtectedRoute>} />
           <Route path="/farmer/government-schemes/:schemeId" element={<ProtectedRoute allowedRoles={['farmer']}><GovernmentSchemeDetailsPage /></ProtectedRoute>} />
           <Route path="/farmer/voice-assistant" element={<ProtectedRoute allowedRoles={['farmer']}><VoiceAssistantPage /></ProtectedRoute>} />
-          <Route path="/farmer/weather" element={<ProtectedRoute allowedRoles={['farmer']}><FarmerModuleGatewayPage /></ProtectedRoute>} />
-          <Route path="/farmer/disease-detection" element={<ProtectedRoute allowedRoles={['farmer']}><FarmerModuleGatewayPage /></ProtectedRoute>} />
+          <Route path="/farmer/weather" element={<ProtectedRoute allowedRoles={['farmer']}><WeatherPage /></ProtectedRoute>} />
+          <Route path="/farmer/disease-detection" element={<ProtectedRoute allowedRoles={['farmer']}><DiseaseDetectionPage /></ProtectedRoute>} />
+          <Route path="/farmer/recommendations" element={<ProtectedRoute allowedRoles={['farmer']}><CropRecommendationPage /></ProtectedRoute>} />
+          <Route path="/farmer/crop-recommendation" element={<ProtectedRoute allowedRoles={['farmer']}><CropRecommendationPage /></ProtectedRoute>} />
+          <Route path="/farmer/fertilizer-recommendation" element={<ProtectedRoute allowedRoles={['farmer']}><FertilizerRecommendationPage /></ProtectedRoute>} />
           <Route path="/farmer/marketplace" element={<ProtectedRoute allowedRoles={['farmer']}><FarmerModuleGatewayPage /></ProtectedRoute>} />
 
           <Route

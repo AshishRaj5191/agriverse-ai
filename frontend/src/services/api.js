@@ -215,4 +215,19 @@ export async function addDiseaseEntry(recordId, payload) {
   return response.data;
 }
 
+export async function getWeather(location) {
+  const response = await api.get('/weather', { params: { location } });
+  return response.data;
+}
+
+export async function recommendCrops(payload) {
+  const response = await api.post('/recommendations/crops', payload);
+  return response.data;
+}
+
+export async function recommendFertilizer(payload) {
+  const response = await api.post('/recommendations/fertilizer', payload);
+  return response.data;
+}
+
 export default api;

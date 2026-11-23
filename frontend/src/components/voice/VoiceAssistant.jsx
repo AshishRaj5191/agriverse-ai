@@ -2,11 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { processVoiceQuestion } from '../../services/api';
 
-const suggestions = [
+const hindiSuggestions = [
   'Meri fasal ke patte peele ho rahe hain, kya karun?',
   'Rabi season mein loamy soil ke liye kaunsi fasal achhi hai?',
   'PM Kisan scheme ke liye eligibility kya hai?',
   'Meri fasal ko kitni baar paani dena chahiye?',
+];
+
+const englishSuggestions = [
+  'My crop leaves are turning yellow. What should I do?',
+  'Which crop is suitable for loamy soil in the Rabi season?',
+  'What is the eligibility for the PM Kisan scheme?',
+  'How often should I water my crop?',
 ];
 
 const actionRoutes = {
@@ -16,15 +23,35 @@ const actionRoutes = {
   OPEN_MARKETPLACE: { path: '/farmer/marketplace', label: 'Marketplace' },
   OPEN_FARM_RECORDS: { path: '/farmer/farm-records', label: 'Farm Records' },
   OPEN_EXPERT_CONSULTATION: { path: '/farmer/experts', label: 'Expert Consultation' },
-  OPEN_PROFILE: { path: '/farmer/profile', label: 'Profile' },
 };
 
-const statusLabels = {
-  ready: 'Ready',
-  listening: 'Listening',
-  processing: 'Processing',
-  answerReady: 'Answer Ready',
-  error: 'Needs attention',
+const copyByLanguage = {
+  'hi-IN': {
+    title: 'अपने खेती सहायक से पूछें',
+    description: 'हिंदी या अंग्रेज़ी में बोलें या लिखें। सहायक आपके सवाल के आधार पर जवाब और संबंधित सुविधा बताएगा।',
+    heard: 'मैंने क्या सुना',
+    heardPlaceholder: 'माइक्रोफोन से बोले गए शब्द यहाँ दिखाई देंगे।',
+    inputPlaceholder: 'अपना सवाल हिंदी में लिखें',
+    send: 'भेजें',
+    try: 'यह पूछकर देखें',
+    clear: 'चैट साफ़ करें',
+    speak: 'जवाब सुनें',
+    stop: 'बोलना रोकें',
+    status: { ready: 'तैयार', listening: 'सुन रहा है', processing: 'जवाब तैयार हो रहा है', answerReady: 'जवाब तैयार', error: 'ध्यान दें' },
+  },
+  'en-IN': {
+    title: 'Ask your farming assistant',
+    description: 'Speak or type in English or Hindi. The assistant will answer and show relevant features.',
+    heard: 'What I heard',
+    heardPlaceholder: 'Words spoken through the microphone will appear here.',
+    inputPlaceholder: 'Type your question in English',
+    send: 'Send',
+    try: 'Try asking',
+    clear: 'Clear chat',
+    speak: 'Speak answer',
+    stop: 'Stop speaking',
+    status: { ready: 'Ready', listening: 'Listening', processing: 'Processing', answerReady: 'Answer ready', error: 'Needs attention' },
+  },
 };
 
 function getRecognitionConstructor() {
@@ -49,6 +76,8 @@ function VoiceAssistant({ compact = false }) {
   const [providerNotice, setProviderNotice] = useState('');
   const [isSupported, setIsSupported] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const copy = copyByLanguage[language];
+  const suggestions = language === 'hi-IN' ? hindiSuggestions : englishSuggestions;
 
   const setStatus = (nextStatus) => {
     statusRef.current = nextStatus;
@@ -118,7 +147,9 @@ function VoiceAssistant({ compact = false }) {
       speakText(answer.response);
     } catch (requestError) {
       setStatus('error');
-      setError(requestError?.response?.data?.message || 'Answer receive nahi ho paaya. Please Retry dabayein.');
+      setError(requestError?.response?.data?.message || (language === 'hi-IN'
+        ? 'जवाब प्राप्त नहीं हो पाया। कृपया दोबारा प्रयास करें।'
+        : 'Could not receive an answer. Please try again.'));
     }
   };
 
@@ -188,16 +219,22 @@ function VoiceAssistant({ compact = false }) {
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">AgriVerse AI</p>
-          <h1 className="mt-2 text-3xl font-bold text-slate-900">Ask your farming assistant</h1>
-          <p className="mt-2 text-slate-600">Hindi, Hinglish या English में बोलें या लिखें। Assistant आपके सवाल के अनुसार जवाब और relevant features दिखाएगा।</p>
+          <h1 className="mt-2 text-3xl font-bold text-slate-900">{copy.title}</h1>
+          <p className="mt-2 text-slate-600">{copy.description}</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <label className="text-sm font-medium text-slate-700">Language
-              <select value={language} onChange={(event) => setLanguage(event.target.value)} className="ml-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+            <label className="text-sm font-medium text-slate-700">{language === 'hi-IN' ? 'भाषा' : 'Language'}
+              <select value={language} onChange={(event) => {
+                recognitionRef.current?.abort?.();
+                window.speechSynthesis?.cancel?.();
+                setIsSpeaking(false);
+                setStatus('ready');
+                setLanguage(event.target.value);
+              }} className="ml-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
                 <option value="hi-IN">Hindi / Hinglish</option>
                 <option value="en-IN">English</option>
               </select>
             </label>
-            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${status === 'listening' ? 'bg-red-100 text-red-700' : status === 'processing' ? 'bg-amber-100 text-amber-800' : status === 'answerReady' ? 'bg-sky-100 text-sky-700' : status === 'error' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>{statusLabels[status]}</span>
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${status === 'listening' ? 'bg-red-100 text-red-700' : status === 'processing' ? 'bg-amber-100 text-amber-800' : status === 'answerReady' ? 'bg-sky-100 text-sky-700' : status === 'error' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>{copy.status[status]}</span>
           </div>
         </div>
         <button type="button" aria-label="Start microphone" onClick={startListening} disabled={status === 'processing'} className={`flex h-24 w-24 shrink-0 items-center justify-center self-center rounded-full text-3xl text-white shadow-lg transition focus:outline-none focus:ring-4 focus:ring-emerald-200 ${status === 'listening' ? 'animate-pulse bg-red-600' : 'bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-400'}`}>
@@ -207,30 +244,35 @@ function VoiceAssistant({ compact = false }) {
 
       {!isSupported && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Voice recognition इस browser में उपलब्ध नहीं है। Text input अभी भी काम करेगा।</div>}
       {error && <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><span>{error}</span>{lastQuestion && <button type="button" onClick={() => processQuestion(lastQuestion)} className="rounded-lg bg-red-700 px-3 py-2 font-semibold text-white">Retry</button>}</div>}
-      {providerNotice && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">{providerNotice} Local safe guidance दिखाई जा रही है। AI provider enable करने के लिए backend में GROQ_API_KEY configure करें।</div>}
+      {providerNotice && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        {providerNotice}
+        {language === 'hi-IN'
+          ? ' AI provider चालू करने के लिए backend में GROQ_API_KEY configure करें।'
+          : ' Configure GROQ_API_KEY in the backend to enable the AI provider.'}
+      </div>}
 
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white/80 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">What I heard</p>
-        <p className="mt-3 min-h-12 text-sm leading-6 text-slate-700">{transcript || 'Microphone से बोले गए शब्द यहाँ दिखेंगे।'}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{copy.heard}</p>
+        <p className="mt-3 min-h-12 text-sm leading-6 text-slate-700">{transcript || copy.heardPlaceholder}</p>
         <form onSubmit={(event) => { event.preventDefault(); processQuestion(typedQuestion); }} className="mt-4 flex gap-2">
-          <input value={typedQuestion} onChange={(event) => setTypedQuestion(event.target.value)} placeholder="Type your question" aria-label="Type your farming question" className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500" />
-          <button type="submit" disabled={!typedQuestion.trim() || status === 'processing'} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:bg-slate-400">Send</button>
+          <input value={typedQuestion} onChange={(event) => setTypedQuestion(event.target.value)} placeholder={copy.inputPlaceholder} aria-label={copy.inputPlaceholder} className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500" />
+          <button type="submit" disabled={!typedQuestion.trim() || status === 'processing'} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:bg-slate-400">{copy.send}</button>
         </form>
       </div>
 
-      {status === 'processing' && <div className="mt-4 flex items-center gap-2 rounded-xl bg-amber-50 p-4 text-sm text-amber-800"><span className="animate-pulse">●●●</span> Answer तैयार किया जा रहा है...</div>}
+      {status === 'processing' && <div className="mt-4 flex items-center gap-2 rounded-xl bg-amber-50 p-4 text-sm text-amber-800"><span className="animate-pulse">●●●</span> {language === 'hi-IN' ? 'जवाब तैयार किया जा रहा है...' : 'Preparing your answer...'}</div>}
 
       <div className="mt-6 flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold text-slate-800">Try asking</p>
-        <button type="button" onClick={clearConversation} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Clear chat</button>
+        <p className="text-sm font-semibold text-slate-800">{copy.try}</p>
+        <button type="button" onClick={clearConversation} className="text-sm font-semibold text-slate-600 hover:text-slate-900">{copy.clear}</button>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">{suggestions.map((suggestion) => <button key={suggestion} type="button" onClick={() => processQuestion(suggestion)} className="rounded-full border border-emerald-200 bg-white px-3 py-2 text-left text-sm text-emerald-800 hover:bg-emerald-50">{suggestion}</button>)}</div>
 
       {latestAnswer && <div className="mt-5 flex flex-wrap gap-2">
         {latestAnswer.actions?.map((action) => actionRoutes[action] ? <Link key={action} to={actionRoutes[action].path} className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{actionRoutes[action].label} →</Link> : null)}
         {isSpeaking
-          ? <button type="button" onClick={stopSpeaking} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700">Stop speaking</button>
-          : <button type="button" onClick={() => speakText(latestAnswer.response)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700">🔊 Speak answer</button>}
+          ? <button type="button" onClick={stopSpeaking} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700">{copy.stop}</button>
+          : <button type="button" onClick={() => speakText(latestAnswer.response)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700">🔊 {copy.speak}</button>}
       </div>}
 
       {conversation.length > 0 && <div className="mt-6 max-h-96 space-y-3 overflow-y-auto rounded-2xl border border-slate-200 bg-white/80 p-4">{conversation.map((message, index) => <div key={`${message.time}-${index}`} className={`rounded-xl p-3 ${message.speaker === 'You' ? 'bg-slate-100' : 'bg-emerald-50'}`}><div className="flex items-center justify-between gap-3"><span className="text-xs font-bold text-slate-700">{message.speaker}</span><span className="text-[10px] text-slate-500">{message.time}</span></div><p className="mt-1 whitespace-pre-line text-sm leading-6 text-slate-700">{message.text}</p></div>)}</div>}

@@ -177,13 +177,27 @@ export async function declineConsultation(id) {
   return response.data;
 }
 
+export async function closeConsultation(id) {
+  const response = await api.patch(`/consultations/${id}/close`);
+  return response.data;
+}
+
 export async function getConsultationMessages(id) {
   const response = await api.get(`/consultations/${id}/messages`);
   return response.data;
 }
 
-export async function sendConsultationMessage(id, message) {
-  const response = await api.post(`/consultations/${id}/messages`, { message });
+export async function sendConsultationMessage(id, message, images = []) {
+  if (!images.length) {
+    const response = await api.post(`/consultations/${id}/messages`, { message });
+    return response.data;
+  }
+  const formData = new FormData();
+  formData.append('message', message || '');
+  images.forEach((image) => formData.append('images', image));
+  const response = await api.post(`/consultations/${id}/messages`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return response.data;
 }
 
@@ -194,6 +208,11 @@ export async function getNotifications() {
 
 export async function markNotificationRead(id) {
   const response = await api.patch(`/notifications/${id}/read`);
+  return response.data;
+}
+
+export async function markAllNotificationsRead() {
+  const response = await api.patch('/notifications/read-all');
   return response.data;
 }
 

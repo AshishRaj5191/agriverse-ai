@@ -1,9 +1,23 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { ALLOWED_ACTIONS, understandVoiceRequest } = require('../src/services/voiceService');
+const { ALLOWED_ACTIONS, understandVoiceRequest, normalizeLanguage, localAnswer } = require('../src/services/voiceService');
+
+test('voice answers use the explicitly selected language', () => {
+  assert.equal(normalizeLanguage('en-IN'), 'en-IN');
+  assert.equal(normalizeLanguage('hi-IN'), 'hi-IN');
+  assert.equal(normalizeLanguage('unknown'), 'hi-IN');
+
+  const english = localAnswer('CROP_PROBLEM', 'yellow leaves', 'en-IN');
+  const hindi = localAnswer('CROP_PROBLEM', 'yellow leaves', 'hi-IN');
+
+  assert.match(english, /Yellowing|leaves|soil/i);
+  assert.doesNotMatch(english, /ho sakta|karein|pattiyon/);
+  assert.match(hindi, /पत्त|पानी|रोग|मिट्टी/);
+  assert.doesNotMatch(hindi, /[A-Za-z]/);
+});
 
 test('voice intent understands weather without inventing forecast data', () => {
-  const result = understandVoiceRequest({ text: 'kal baarish hogi?' });
+  const result = understandVoiceRequest({ text: 'kal baarish hogi?', language: 'en-IN' });
 
   assert.equal(result.intent, 'WEATHER');
   assert.equal(result.action, 'OPEN_WEATHER');

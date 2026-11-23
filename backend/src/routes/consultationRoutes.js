@@ -33,6 +33,6 @@ router.patch('/:id/accept', authorize('expert'), changeConsultationStatus);
 router.patch('/:id/decline', authorize('expert'), changeConsultationStatus);
 router.patch('/:id/close', changeConsultationStatus);
 router.get('/:id/messages', listMessages);
-router.post('/:id/messages', sendMessage);
+router.post('/:id/messages', upload.array('images', 3), sendMessage);
 
 module.exports = router;

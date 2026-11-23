@@ -7,10 +7,10 @@ import {
 } from '../utils/auth';
 
 function navClass({ isActive }) {
-  return `rounded-md px-3 py-2 text-sm font-medium transition ${
+  return `rounded-lg px-3 py-2 text-sm font-bold transition ${
     isActive
-      ? 'bg-leaf text-white'
-      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+      ? 'bg-emerald-700 text-white shadow-sm'
+      : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800'
   }`;
 }
 
@@ -36,14 +36,14 @@ function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-emerald-100/70 bg-[#f8faf7]/90 backdrop-blur-xl">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3">
-          <NavLink to="/" className="flex items-center gap-3 text-lg font-bold text-leaf">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-green-100 text-base font-extrabold text-leaf shadow-sm">
-              A
+          <NavLink to="/" className="flex items-center gap-3 text-lg font-black tracking-tight text-slate-950">
+            <span className="flex h-10 w-10 items-center justify-center rounded-[0.85rem] bg-emerald-700 text-sm font-black text-white shadow-[0_8px_20px_rgba(4,120,87,0.20)]">
+              AV
             </span>
-            AgriVerse AI
+            <span>AgriVerse <span className="text-emerald-700">AI</span></span>
           </NavLink>
 
           <nav className="hidden items-center gap-2 md:flex">
@@ -71,9 +71,11 @@ function Navbar() {
                 {role === 'farmer' || role === 'buyer' ? <NavLink to={`/${role}/marketplace`} className={navClass}>Marketplace</NavLink> : null}
                 {role === 'farmer' || role === 'buyer' ? <NavLink to={`/${role}/messages`} className={navClass}>Messages</NavLink> : null}
                 {role === 'farmer' ? <NavLink to="/farmer/notifications" className={navClass}>Notifications</NavLink> : null}
-                <NavLink to={profilePath} className={navClass}>
-                  Profile
-                </NavLink>
+                {role !== 'farmer' ? (
+                  <NavLink to={profilePath} className={navClass}>
+                    Profile
+                  </NavLink>
+                ) : null}
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -130,9 +132,11 @@ function Navbar() {
                   {role === 'farmer' || role === 'buyer' ? <NavLink to={`/${role}/marketplace`} onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">Marketplace</NavLink> : null}
                   {role === 'farmer' || role === 'buyer' ? <NavLink to={`/${role}/messages`} onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">Messages</NavLink> : null}
                   {role === 'farmer' ? <NavLink to="/farmer/notifications" onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">Notifications</NavLink> : null}
-                  <NavLink to={profilePath} onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">
-                    Profile
-                  </NavLink>
+                  {role !== 'farmer' ? (
+                    <NavLink to={profilePath} onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">
+                      Profile
+                    </NavLink>
+                  ) : null}
                   <button type="button" onClick={handleLogout} className="rounded-md px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-red-50 hover:text-red-600">
                     Logout
                   </button>

@@ -20,4 +20,16 @@ async function markNotificationRead(req, res, next) {
   } catch (error) { return next(error); }
 }
 
-module.exports = { listNotifications, markNotificationRead };
+async function markAllNotificationsRead(req, res, next) {
+  try {
+    const result = await Notification.updateMany(
+      { recipient: req.user.userId, readAt: null },
+      { $set: { readAt: new Date() } }
+    );
+    return res.json({ success: true, message: 'All notifications marked as read.', data: { modifiedCount: result.modifiedCount } });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = { listNotifications, markNotificationRead, markAllNotificationsRead };

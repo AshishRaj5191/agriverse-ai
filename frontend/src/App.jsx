@@ -7,7 +7,6 @@ import BuyerProfilePage from './pages/BuyerProfilePage'
 import ExpertDashboardPage from './pages/ExpertDashboardPage'
 import ExpertProfilePage from './pages/ExpertProfilePage'
 import FarmerDashboardPage from './pages/FarmerDashboardPage'
-import FarmerProfilePage from './pages/FarmerProfilePage'
 import FarmerExpertsPage from './pages/FarmerExpertsPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
@@ -48,14 +47,6 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <FarmerDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/farmer/profile"
-            element={
-              <ProtectedRoute allowedRoles={['farmer']}>
-                <FarmerProfilePage />
               </ProtectedRoute>
             }
           />

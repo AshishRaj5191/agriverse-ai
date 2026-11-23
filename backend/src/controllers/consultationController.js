@@ -127,7 +127,12 @@ async function respondToConsultation(req, res, next) {
 async function changeConsultationStatus(req, res, next) {
   try {
     const consultation = await getConsultationForParticipant(req.params.id, req.user.userId);
-    if (consultation.expert._id.toString() !== req.user.userId) throw new ApiError(403, 'Only the assigned expert can change this request.');
+    const isCloseRequest = req.path.endsWith('/close');
+    if (isCloseRequest) {
+      if (consultation.farmer._id.toString() !== req.user.userId) throw new ApiError(403, 'Only the farmer who created this request can close it.');
+    } else if (consultation.expert._id.toString() !== req.user.userId) {
+      throw new ApiError(403, 'Only the assigned expert can accept or decline this request.');
+    }
     const status = req.path.endsWith('/accept') ? 'accepted' : req.path.endsWith('/decline') ? 'declined' : 'closed';
     const updated = await ConsultationRequest.findByIdAndUpdate(req.params.id, { status }, { new: true }).lean();
     await Notification.create({ recipient: consultation.farmer._id, type: `consultation_${status}`, message: `Your consultation request has been ${status}.`, consultation: updated._id });
@@ -147,11 +152,27 @@ async function sendMessage(req, res, next) {
   try {
     const consultation = await getConsultationForParticipant(req.params.id, req.user.userId);
     const message = clean(req.body.message, 4000);
-    if (!message) throw new ApiError(400, 'Message is required.');
+    if (!message && !(req.files || []).length) throw new ApiError(400, 'Message or image is required.');
     if (consultation.status === 'pending') throw new ApiError(400, 'Messaging is available after the expert accepts the consultation.');
     if (['declined', 'rejected', 'closed', 'completed'].includes(consultation.status)) throw new ApiError(400, 'This consultation is closed.');
     const receiver = consultation.farmer._id.toString() === req.user.userId ? consultation.expert._id : consultation.farmer._id;
-    const created = await ConsultationMessage.create({ consultation: req.params.id, sender: req.user.userId, receiver, message });
+    const attachments = [];
+    for (const file of req.files || []) {
+      attachments.push(await uploadImage(file.buffer, file.originalname, 'consultation-messages'));
+    }
+    const created = await ConsultationMessage.create({
+      consultation: req.params.id,
+      sender: req.user.userId,
+      receiver,
+      message: message || 'Shared an image.',
+      attachments,
+    });
+    await Notification.create({
+      recipient: receiver,
+      type: 'consultation_message',
+      message: `New message for your consultation: ${consultation.problemTitle}.`,
+      consultation: consultation._id,
+    });
     return res.status(201).json({ success: true, data: await ConsultationMessage.findById(created._id).populate('sender', 'name role').lean() });
   } catch (error) { return next(error); }
 }

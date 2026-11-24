@@ -1,3 +1,12 @@
+---
+title: AgriVerse AI
+emoji: 🌱
+colorFrom: green
+colorTo: yellow
+sdk: docker
+app_port: 7860
+---
+
 # AgriVerse AI - Day 1 Foundation
 
 AgriVerse AI is an MCA major project prototype for building an intelligent agriculture ecosystem. This Day 1 setup includes only project foundation: monorepo structure, frontend base, backend base, MongoDB config, and authentication foundation.
@@ -150,3 +159,12 @@ Both responses return a JWT token under `data.token`.
 - Farmer profile module
 - Farm details module
 - Additional validation and testing
+
+## Deployment
+
+The deployment configuration targets Vercel for the frontend, Render for the Node.js backend, and a Docker-based Hugging Face Space for the Python AI service.
+
+- Create the Hugging Face Space from this repository using the Docker SDK. The root `Dockerfile` installs CPU-only PyTorch and serves the AI API on port `7860`. The trained checkpoint at `ai-service/models/checkpoints/model.pt` must remain available.
+- Create the Render service from `render.yaml`. Set `MONGODB_URI`, `CORS_ORIGIN`, `PUBLIC_API_URL`, and `AI_SERVICE_URL` to the Atlas URI, Vercel origin, Render service URL, and Hugging Face Space URL respectively.
+- Import the repository into Vercel. Set `VITE_API_BASE_URL` to the Render API URL ending in `/api/v1`.
+- Add optional backend integrations such as Cloudinary and Groq as Render environment variables when enabling those features. Do not commit credentials.

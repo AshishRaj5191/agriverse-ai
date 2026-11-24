@@ -1,0 +1,15 @@
+.git
+.gitignore
+ai-agent_1
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules
+**/.venv
+**/venv
+**/__pycache__
+**/*.py[cod]
+ai-service/data
+ai-service/evaluation_results
+frontend/dist
+backend/uploads
